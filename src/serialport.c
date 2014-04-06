@@ -46,13 +46,6 @@ static mrb_sym sym_dcd;
 static mrb_sym sym_ri;
 
 mrb_value
-mrb_serial_baud(mrb_state *mrb, mrb_value val)
-{
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
-}
-
-mrb_value
 mrb_serial_set_baud(mrb_state *mrb, mrb_value val)
 {
   mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
@@ -75,13 +68,6 @@ mrb_serial_create(mrb_state *mrb, mrb_value val)
 
 mrb_value
 mrb_serial_cts(mrb_state *mrb, mrb_value val)
-{
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
-}
-
-mrb_value
-mrb_serial_data_bits(mrb_state *mrb, mrb_value val)
 {
   mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
   return mrb_nil_value();
@@ -139,8 +125,19 @@ mrb_serial_set_flow_control(mrb_state *mrb, mrb_value val)
 mrb_value
 mrb_serial_get_modem_params(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  struct modem_params_t modem_params;
+  mrb_value hash;
+
+  mrb_serial_get_modem_params_impl(mrb, &modem_params);
+
+  hash = mrb_hash_new(mrb);
+
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_baud),      mrb_fixnum_value(modem_params.baud_rate));
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_data_bits), mrb_fixnum_value(modem_params.data_bits));
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_stop_bits), mrb_fixnum_value(modem_params.stop_bits));
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_parity),    mrb_fixnum_value(modem_params.parity));
+
+  return hash;
 }
 
 mrb_value
@@ -166,25 +163,12 @@ mrb_serial_get_signals(mrb_state *mrb, mrb_value val)
 }
 
 mrb_value
-mrb_serial_modem_params(mrb_state *mrb, mrb_value val)
-{
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
-}
-
-mrb_value
 mrb_serial_new(mrb_state *mrb, mrb_value val)
 {
   mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
   return mrb_nil_value();
 }
 
-mrb_value
-mrb_serial_parity(mrb_state *mrb, mrb_value val)
-{
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
-}
 
 mrb_value
 mrb_serial_set_parity(mrb_state *mrb, mrb_value val)
@@ -243,13 +227,6 @@ mrb_serial_signals(mrb_state *mrb, mrb_value val)
 }
 
 mrb_value
-mrb_serial_stop_bits(mrb_state *mrb, mrb_value val)
-{
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
-}
-
-mrb_value
 mrb_serial_set_stop_bits(mrb_state *mrb, mrb_value val)
 {
   mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
@@ -285,10 +262,10 @@ mrb_mruby_serialport_gem_init(mrb_state *mrb)
   sym_stop_bits = mrb_intern_lit(mrb, "stop_bits");
   sym_parity    = mrb_intern_lit(mrb, "parity");
 
+  mrb_define_method(mrb, serialport_class, "baud=",            mrb_serial_set_baud,          MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "break",            mrb_serial_break,             MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "create",           mrb_serial_create,             MRB_ARGS_ANY()); /* private mehtod */
   mrb_define_method(mrb, serialport_class, "cts",              mrb_serial_cts,               MRB_ARGS_NONE());
-  mrb_define_method(mrb, serialport_class, "data_bits",        mrb_serial_data_bits,         MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "data_bits=",       mrb_serial_set_data_bits,     MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "dcd",              mrb_serial_dcd,               MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "dsr",              mrb_serial_dsr,               MRB_ARGS_NONE());
@@ -298,10 +275,8 @@ mrb_mruby_serialport_gem_init(mrb_state *mrb)
   mrb_define_method(mrb, serialport_class, "flow_control=",    mrb_serial_set_flow_control,  MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "get_modem_params", mrb_serial_get_modem_params,  MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "get_signals",      mrb_serial_get_signals,       MRB_ARGS_NONE());
-  mrb_define_method(mrb, serialport_class, "modem_params",     mrb_serial_modem_params,      MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "modem_params=",    mrb_serial_set_modem_params,  MRB_ARGS_ANY());
   mrb_define_method(mrb, serialport_class, "new",              mrb_serial_new,               MRB_ARGS_ANY());
-  mrb_define_method(mrb, serialport_class, "parity",           mrb_serial_parity,            MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "parity=",          mrb_serial_set_parity,        MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "read_timeout",     mrb_serial_read_timeout,      MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "read_timeout=",    mrb_serial_set_read_timeout,  MRB_ARGS_REQ(1));
@@ -310,7 +285,6 @@ mrb_mruby_serialport_gem_init(mrb_state *mrb)
   mrb_define_method(mrb, serialport_class, "rts=",             mrb_serial_set_rts,           MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "set_modem_params", mrb_serial_set_modem_params,  MRB_ARGS_ANY());
   mrb_define_method(mrb, serialport_class, "signals",          mrb_serial_signals,           MRB_ARGS_NONE());
-  mrb_define_method(mrb, serialport_class, "stop_bits",        mrb_serial_stop_bits,         MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "stop_bits=",       mrb_serial_set_stop_bits,     MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "write_timeout",    mrb_serial_write_timeout,     MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "write_timeout=",   mrb_serial_set_write_timeout, MRB_ARGS_REQ(1));
