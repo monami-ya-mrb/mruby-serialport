@@ -1,0 +1,12 @@
+env:
+  matrix:
+  - MRUBY_REPO=https://github.com/mruby/mruby.git MRUBY_BRANCH=master
+  - MRUBY_REPO=https://bitbucket.org/monami_ya_mrb/monami-ya.mrb.git MRUBY_BRANCH=master
+  - MRUBY_REPO=https://bitbucket.org/monami_ya_mrb/monami-ya.mrb.git MRUBY_BRANCH=develop
+
+script:
+  - "ruby run_test.rb all test"
+
+branches:
+  only:
+    - master
