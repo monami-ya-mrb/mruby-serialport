@@ -31,6 +31,14 @@
 #include "mruby/variable.h"
 
 #include "serialport.h"
+#include "serialport-impl.h"
+
+static mrb_sym sym_rts;
+static mrb_sym sym_dtr;
+static mrb_sym sym_cts;
+static mrb_sym sym_dsr;
+static mrb_sym sym_dcd;
+static mrb_sym sym_ri;
 
 mrb_value
 mrb_serial_baud(mrb_state *mrb, mrb_value val)
@@ -133,8 +141,23 @@ mrb_serial_get_modem_params(mrb_state *mrb, mrb_value val)
 mrb_value
 mrb_serial_get_signals(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  struct line_signals_t signals;
+  mrb_value hash;
+
+  mrb_serial_get_signals_impl(mrb, &signals);
+
+  hash = mrb_hash_new(mrb);
+
+#if 0 /* windows */
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_rts), mrb_fixnum_value(signals.rts));
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_dtr), mrb_fixnum_value(signals.dtr));
+#endif
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_cts), mrb_fixnum_value(signals.cts));
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_dsr), mrb_fixnum_value(signals.dsr));
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_dcd), mrb_fixnum_value(signals.dcd));
+  mrb_hash_set(mrb, hash, mrb_symbol_value(sym_ri),  mrb_fixnum_value(signals.ri));
+
+  return hash;
 }
 
 mrb_value
@@ -293,6 +316,13 @@ mrb_mruby_serialport_gem_init(mrb_state *mrb)
   mrb_define_const(mrb, serialport_class, "ODD",     mrb_fixnum_value(MRBGEM_SERIALPORT_ODD));
 #define TO_STRING(s) #s
   mrb_define_const(mrb, serialport_class, "VERSION", mrb_str_new_cstr(mrb, TO_STRING(MRBGEM_MRUBY_SERIALPORT_VERSION)));
+
+  sym_rts = mrb_intern_lit(mrb, "rts");
+  sym_dtr = mrb_intern_lit(mrb, "dtr");
+  sym_cts = mrb_intern_lit(mrb, "cts");
+  sym_dsr = mrb_intern_lit(mrb, "dsr");
+  sym_dcd = mrb_intern_lit(mrb, "dcd");
+  sym_ri  = mrb_intern_lit(mrb, "ri");
 }
 
 void

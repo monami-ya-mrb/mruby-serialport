@@ -22,10 +22,20 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "serialport-impl.h"
+#ifndef MRBGEM_MRBGEM_SERIALPORT_IMPL_H__
+#define MRBGEM_MRBGEM_SERIALPORT_IMPL_H__
 
-void
-mrb_serial_get_signals_impl(mrb_state *mrb, struct line_signals_t *signals)
-{
-}
+#include "mruby.h"
 
+struct line_signals_t {
+  mrb_int rts;
+  mrb_int dtr;
+  mrb_int cts;
+  mrb_int dsr;
+  mrb_int dcd;
+  mrb_int ri;
+};
+
+void mrb_serial_get_signals_impl(mrb_state *mrb, struct line_signals_t *signals);
+
+#endif /* MRBGEM_MRBGEM_SERIALPORT_IMPL_H__ */
