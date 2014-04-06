@@ -25,6 +25,11 @@
 #include "serialport-impl.h"
 
 void
+mrb_serial_get_modem_params_impl(mrb_state *mrb, struct modem_params_t *modem_params)
+{
+}
+
+void
 mrb_serial_get_signals_impl(mrb_state *mrb, struct line_signals_t *signals)
 {
 }

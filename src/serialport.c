@@ -33,6 +33,11 @@
 #include "serialport.h"
 #include "serialport-impl.h"
 
+static mrb_sym sym_baud;
+static mrb_sym sym_data_bits;
+static mrb_sym sym_stop_bits;
+static mrb_sym sym_parity;
+
 static mrb_sym sym_rts;
 static mrb_sym sym_dtr;
 static mrb_sym sym_cts;
@@ -275,8 +280,11 @@ mrb_mruby_serialport_gem_init(mrb_state *mrb)
 
   serialport_class = mrb_define_class(mrb, "SerialPort", io_class);
 
-  mrb_define_method(mrb, serialport_class, "baud",             mrb_serial_baud,              MRB_ARGS_NONE());
-  mrb_define_method(mrb, serialport_class, "baud=",            mrb_serial_set_baud,          MRB_ARGS_REQ(1));
+  sym_baud      = mrb_intern_lit(mrb, "baud");
+  sym_data_bits = mrb_intern_lit(mrb, "data_bits");
+  sym_stop_bits = mrb_intern_lit(mrb, "stop_bits");
+  sym_parity    = mrb_intern_lit(mrb, "parity");
+
   mrb_define_method(mrb, serialport_class, "break",            mrb_serial_break,             MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "create",           mrb_serial_create,             MRB_ARGS_ANY()); /* private mehtod */
   mrb_define_method(mrb, serialport_class, "cts",              mrb_serial_cts,               MRB_ARGS_NONE());

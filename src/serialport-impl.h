@@ -27,6 +27,13 @@
 
 #include "mruby.h"
 
+struct modem_params_t {
+  mrb_int baud_rate;
+  mrb_int data_bits;
+  mrb_int stop_bits;
+  mrb_int parity;
+};
+
 struct line_signals_t {
   mrb_int rts;
   mrb_int dtr;
@@ -36,6 +43,7 @@ struct line_signals_t {
   mrb_int ri;
 };
 
+void mrb_serial_get_modem_params_impl(mrb_state *mrb, struct modem_params_t *modem_params);
 void mrb_serial_get_signals_impl(mrb_state *mrb, struct line_signals_t *signals);
 
 #endif /* MRBGEM_MRBGEM_SERIALPORT_IMPL_H__ */
