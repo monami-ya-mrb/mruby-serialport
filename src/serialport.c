@@ -114,13 +114,6 @@ mrb_serial_get_signals(mrb_state *mrb, mrb_value val)
 }
 
 mrb_value
-mrb_serial_new(mrb_state *mrb, mrb_value val)
-{
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
-}
-
-mrb_value
 mrb_serial_read_timeout(mrb_state *mrb, mrb_value val)
 {
   mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
@@ -190,7 +183,6 @@ mrb_mruby_serialport_gem_init(mrb_state *mrb)
   mrb_define_method(mrb, serialport_class, "flow_control=",    mrb_serial_set_flow_control,  MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "get_modem_params", mrb_serial_get_modem_params,  MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "get_signals",      mrb_serial_get_signals,       MRB_ARGS_NONE());
-  mrb_define_method(mrb, serialport_class, "new",              mrb_serial_new,               MRB_ARGS_ANY());
   mrb_define_method(mrb, serialport_class, "read_timeout",     mrb_serial_read_timeout,      MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "read_timeout=",    mrb_serial_set_read_timeout,  MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "rts=",             mrb_serial_set_rts,           MRB_ARGS_REQ(1));
