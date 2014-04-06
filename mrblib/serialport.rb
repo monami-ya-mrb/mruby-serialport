@@ -90,3 +90,45 @@ class SerialPort
 
 end
 
+# signals (get)
+class SerialPort
+
+  alias_method :signals, :get_signals
+
+  def self.rts
+    hash = signals
+    raise new NotImplementedError unless hash.key? :rts
+    hash[:rts]
+  end
+
+  def self.dtr
+    hash = signals
+    raise new NotImplementedError unless hash.key? :dtr
+    hash[:dtr]
+  end
+
+  def self.cts
+    hash = signals
+    raise new NotImplementedError unless hash.key? :cts
+    hash[:cts]
+  end
+
+  def self.dsr
+    hash = signals
+    raise new NotImplementedError unless hash.key? :dsr
+    hash[:dsr]
+  end
+
+  def self.dcd
+    hash = signals
+    raise new NotImplementedError unless hash.key? :dcd
+    hash[:dcd]
+  end
+
+  def self.ri
+    hash = signals
+    raise new NotImplementedError unless hash.key? :ri
+    hash[:ri]
+  end
+
+end
