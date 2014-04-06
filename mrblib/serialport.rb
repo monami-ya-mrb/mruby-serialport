@@ -60,3 +60,33 @@ class SerialPort
   end
 
 end
+
+# modem_params (set)
+class SerialPort
+
+  alias_method :modem_params=, :set_modem_params
+
+  def self.baud=(baud)
+    raise ArgumentError.new "baud must be from 50 to 256000." if data_bits < 50 or data_bits > 256000
+    set_modem_params baud, nil, nil, nil
+  end
+
+  def self.data_bits=(data_bits)
+    raise ArgumentError.new "data_bits must be from 5 to 8." if data_bits < 5 or data_bits > 8
+    set_modem_params nil, data_bits, nil, nil
+  end
+
+  def self.stop_bits=(stop_bits)
+    raise ArgumentError.new "stop_bits must be from 1 or 2." if stop_bits != 1 and stop_bits != 2
+    set_modem_params nil, stop_bits, nil, nil
+  end
+
+  def self.parity=(parity)
+    if parity != NONE and parity != EVEN and parity != ODD and parity != MARK and parity != SPACE
+      raise ArgumentError.new "Invalid value for parity."
+    end
+    set_modem_params nil, nil, nil, parity
+  end
+
+end
+
