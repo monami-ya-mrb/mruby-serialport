@@ -53,13 +53,6 @@ mrb_serial_break(mrb_state *mrb, mrb_value val)
 }
 
 mrb_value
-mrb_serial_create(mrb_state *mrb, mrb_value val)
-{
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
-}
-
-mrb_value
 mrb_serial_set_dtr(mrb_state *mrb, mrb_value val)
 {
   mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
@@ -192,7 +185,6 @@ mrb_mruby_serialport_gem_init(mrb_state *mrb)
   sym_ri  = mrb_intern_lit(mrb, "ri");
 
   mrb_define_method(mrb, serialport_class, "break",            mrb_serial_break,             MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, serialport_class, "create",           mrb_serial_create,             MRB_ARGS_ANY()); /* private mehtod */
   mrb_define_method(mrb, serialport_class, "dtr=",             mrb_serial_set_dtr,           MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "flow_control",     mrb_serial_flow_control,      MRB_ARGS_NONE());
   mrb_define_method(mrb, serialport_class, "flow_control=",    mrb_serial_set_flow_control,  MRB_ARGS_REQ(1));
