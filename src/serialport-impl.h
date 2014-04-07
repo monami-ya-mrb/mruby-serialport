@@ -35,6 +35,9 @@ struct modem_params_t {
 };
 
 struct line_signals_t {
+  /* get: 1 = on,  0 = off
+   * set: 1 = on, -1 = off, 0 = keep previous
+   */
   mrb_int rts;
   mrb_int dtr;
   mrb_int cts;
