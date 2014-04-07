@@ -24,13 +24,109 @@
 
 #include "serialport-impl.h"
 
+static int
+get_fd_helper(mrb_state *mrb)
+{
+  /* TODO: implement */
+  return -1;
+}
+
+void
+mrb_serial_break_impl(mrb_state *mrb, mrb_int time)
+{
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
+}
+
+mrb_int
+mrb_serial_flow_control_impl(mrb_state *mrb)
+{
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
+}
+
+void
+mrb_serial_set_flow_control_impl(mrb_state *mrb, mrb_int flow_control)
+{
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
+}
+
+mrb_int
+mrb_read_timeout_impl(mrb_state *mrb)
+{
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
+}
+
+void
+mrb_set_read_timeout_impl(mrb_state *mrb, mrb_int time)
+{
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
+}
+
+mrb_int
+mrb_write_timeout_impl(mrb_state *mrb)
+{
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
+}
+
+void
+mrb_set_write_timeout_impl(mrb_state *mrb, mrb_int time)
+{
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
+}
+
 void
 mrb_serial_get_modem_params_impl(mrb_state *mrb, struct modem_params_t *modem_params)
 {
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
 }
 
 void
 mrb_serial_get_signals_impl(mrb_state *mrb, struct line_signals_t *signals)
 {
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
+}
+
+mrb_value
+mrb_serial_set_modem_params_impl(mrb_state *mrb, struct modem_params_t *modem_params)
+{
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
+}
+
+void
+mrb_serial_set_signals_impl(mrb_state *mrb, struct line_signals_t *signals)
+{
+  int fd;
+  fd = get_fd_helper(mrb);
+
+  /* TODO: implement */
 }
 
