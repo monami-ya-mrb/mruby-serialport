@@ -33,6 +33,7 @@
 #include "serialport.h"
 #include "serialport-impl.h"
 
+
 static mrb_sym sym_baud;
 static mrb_sym sym_data_bits;
 static mrb_sym sym_stop_bits;
@@ -45,35 +46,71 @@ static mrb_sym sym_dsr;
 static mrb_sym sym_dcd;
 static mrb_sym sym_ri;
 
-mrb_value
+static mrb_value
 mrb_serial_break(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
+  mrb_int time;
+  if (mrb_type(val) != MRB_TT_FIXNUM) {
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
+  }
+
+  time = mrb_fixnum(val);
+  mrb_serial_break_impl(mrb, time);
+
   return mrb_nil_value();
 }
 
-mrb_value
+static mrb_value
 mrb_serial_set_dtr(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  struct line_signals_t signals = { 0 };
+
+  if (mrb_type(val) != MRB_TT_FIXNUM) {
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
+  }
+  switch (mrb_fixnum(val)) {
+  case 0:
+    signals.dtr = -1;
+    break;
+  case 1:
+    signals.dtr = 1;
+    break;
+  default:
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be 0 or 1.");
+    break;
+  }
+
+  mrb_serial_set_signals_impl(mrb, &signals);
+
+  return val;
 }
 
-mrb_value
+static mrb_value
 mrb_serial_flow_control(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  mrb_int flow_control;
+
+  flow_control = mrb_serial_flow_control_impl(mrb);
+
+  return mrb_fixnum_value(flow_control);
 }
 
-mrb_value
+static mrb_value
 mrb_serial_set_flow_control(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  mrb_int flow_control;
+
+  if (mrb_type(val) != MRB_TT_FIXNUM) {
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
+  }
+
+  flow_control = mrb_fixnum(val);
+  mrb_serial_set_flow_control_impl(mrb, flow_control);
+
+  return val;
 }
 
-mrb_value
+static mrb_value
 mrb_serial_get_modem_params(mrb_state *mrb, mrb_value val)
 {
   struct modem_params_t modem_params;
@@ -91,7 +128,7 @@ mrb_serial_get_modem_params(mrb_state *mrb, mrb_value val)
   return hash;
 }
 
-mrb_value
+static mrb_value
 mrb_serial_get_signals(mrb_state *mrb, mrb_value val)
 {
   struct line_signals_t signals;
@@ -101,7 +138,7 @@ mrb_serial_get_signals(mrb_state *mrb, mrb_value val)
 
   hash = mrb_hash_new(mrb);
 
-#if 0 /* windows */
+#if 1 /* not windows */
   mrb_hash_set(mrb, hash, mrb_symbol_value(sym_rts), mrb_fixnum_value(signals.rts));
   mrb_hash_set(mrb, hash, mrb_symbol_value(sym_dtr), mrb_fixnum_value(signals.dtr));
 #endif
@@ -113,46 +150,244 @@ mrb_serial_get_signals(mrb_state *mrb, mrb_value val)
   return hash;
 }
 
-mrb_value
+static mrb_value
 mrb_serial_read_timeout(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  mrb_int time;
+
+  time = mrb_read_timeout_impl(mrb);
+
+  return mrb_fixnum_value(time);
 }
 
-mrb_value
+static mrb_value
 mrb_serial_set_read_timeout(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  mrb_int time;
+
+  if (mrb_type(val) != MRB_TT_FIXNUM) {
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
+  }
+
+  time = mrb_fixnum(val);
+  mrb_set_read_timeout_impl(mrb, time);
+
+  return val;
 }
 
-mrb_value
+static mrb_value
 mrb_serial_set_rts(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  struct line_signals_t signals = { 0 };
+
+  if (mrb_type(val) != MRB_TT_FIXNUM) {
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
+  }
+  switch (mrb_fixnum(val)) {
+  case 0:
+    signals.rts = -1;
+    break;
+  case 1:
+    signals.rts = 1;
+    break;
+  default:
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be 0 or 1.");
+    break;
+  }
+
+  mrb_serial_set_signals_impl(mrb, &signals);
+
+  return val;
 }
 
-mrb_value
-mrb_serial_set_modem_params(mrb_state *mrb, mrb_value val)
+
+static inline void
+mrb_serial_set_modem_params_hash(mrb_state *mrb, mrb_value hash, struct modem_params_t *modem_params)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  mrb_value keys;
+  mrb_int keys_len;
+  mrb_int i;
+  mrb_value key;
+  mrb_value value;
+  mrb_int int_value;
+
+  keys = mrb_hash_keys(mrb, hash);
+  keys_len = mrb_ary_len(mrb, keys);
+
+  for (i = 0; i < keys_len; i++) {
+    mrb_value cmp;
+    key = mrb_ary_entry(keys, i);
+
+    switch (mrb_type(key)) {
+    case MRB_TT_STRING:
+      cmp = mrb_str_intern(mrb, key);
+      break;
+    case MRB_TT_SYMBOL:
+      cmp = key;
+      break;
+    default:
+      mrb_raisef(mrb, E_ARGUMENT_ERROR, "Invalid key `%S'.", key);
+    }
+
+    value = mrb_hash_get(mrb, hash, key);
+    if (mrb_type(value) != MRB_TT_FIXNUM) {
+      mrb_raisef(mrb, E_ARGUMENT_ERROR, "Invalid value `%S'.", value);
+    }
+    int_value = mrb_fixnum(value);
+
+    if (mrb_symbol(cmp) == sym_baud) {
+      modem_params->baud_rate = int_value;
+    }
+    else if (mrb_symbol(cmp) == sym_data_bits) {
+      modem_params->data_bits = int_value;
+    }
+    else if (mrb_symbol(cmp) == sym_stop_bits) {
+      modem_params->stop_bits = int_value;
+    }
+    else if (mrb_symbol(cmp) == sym_parity) {
+      modem_params->parity = int_value;
+    }
+    else {
+      mrb_raisef(mrb, E_ARGUMENT_ERROR, "Invalid key `%S'.", key);
+    }
+  }
 }
 
-mrb_value
+static inline void
+mrb_serial_set_modem_params_args(mrb_state *mrb, int argc, mrb_value *argv, struct modem_params_t *modem_params)
+{
+  mrb_int previous_data_bits;
+
+  previous_data_bits = modem_params->data_bits;
+
+  /* It's guaranteed argc is more than 1 by mrb_serial_set_modem_params(). */
+
+  if (mrb_nil_p(argv[0])) {
+    /* Do nothing. Keep previous baud_rate parameter. */
+  } else {
+    if (mrb_type(argv[0]) == MRB_TT_FIXNUM) {
+      modem_params->baud_rate = mrb_fixnum(argv[0]);
+    }
+    else {
+      mrb_raisef(mrb, E_ARGUMENT_ERROR, "Invalid value `%S' for baud_rate.", argv[0]);
+    }
+  }
+
+  if (argc > 1) {
+    if (mrb_type(argv[1]) == MRB_TT_FIXNUM) {
+      modem_params->data_bits = mrb_fixnum(argv[1]);
+    }
+    else {
+      mrb_raisef(mrb, E_ARGUMENT_ERROR, "Invalid value `%S' for data_bits.", argv[1]);
+    }
+  }
+  else {
+    modem_params->data_bits = 8;
+  }
+
+  if (argc > 2) {
+    if (mrb_type(argv[2]) == MRB_TT_FIXNUM) {
+      modem_params->stop_bits = mrb_fixnum(argv[2]);
+    }
+    else {
+      mrb_raisef(mrb, E_ARGUMENT_ERROR, "Invalid value `%S' for stop_bits.", argv[2]);
+    }
+  }
+  else {
+    modem_params->stop_bits = 1;
+  }
+    
+  if (argc > 3) {
+    if (mrb_type(argv[3]) == MRB_TT_FIXNUM) {
+      modem_params->parity = mrb_fixnum(argv[3]);
+    }
+    else {
+      mrb_raisef(mrb, E_ARGUMENT_ERROR, "Invalid value `%S' for parity.", argv[3]);
+    }
+  }
+  else {
+    modem_params->parity = (previous_data_bits == 8) ? MRBGEM_SERIALPORT_NONE : MRBGEM_SERIALPORT_EVEN;
+  }
+
+  if (argc > 4) {
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "Too many arguments.");
+  }
+}
+
+static mrb_value
+mrb_serial_set_modem_params(mrb_state *mrb, mrb_value self)
+{
+  mrb_value *argv;
+  int argc;
+  struct modem_params_t modem_params;
+  mrb_value result;
+
+  mrb_get_args(mrb, "*", &argv, &argc);
+
+  if (argc == 0) {
+    result = self;
+  }
+  else {
+      mrb_serial_get_modem_params_impl(mrb, &modem_params);
+
+      if (argc == 1 && mrb_type(argv[0]) == MRB_TT_HASH) {
+	mrb_serial_set_modem_params_hash(mrb, argv[0], &modem_params);
+      }
+      else {
+	mrb_serial_set_modem_params_args(mrb, argc, argv, &modem_params);
+      }
+
+      if (modem_params.baud_rate < 50 ||
+	  modem_params.baud_rate > 256000) {
+	mrb_raise(mrb, E_ARGUMENT_ERROR, "Invalid value for baud_rate.");
+      }
+
+      if (modem_params.data_bits < 4 ||
+	  modem_params.data_bits > 8) {
+	mrb_raise(mrb, E_ARGUMENT_ERROR, "Invalid value for data_bits.");
+      }
+      if (modem_params.stop_bits != 1 &&
+	  modem_params.stop_bits != 2) {
+	mrb_raise(mrb, E_ARGUMENT_ERROR, "Invalid value for stop_bits.");
+      }
+
+      if (modem_params.parity != MRBGEM_SERIALPORT_NONE &&
+	  modem_params.parity != MRBGEM_SERIALPORT_EVEN &&
+	  modem_params.parity != MRBGEM_SERIALPORT_ODD  &&
+	  modem_params.parity != MRBGEM_SERIALPORT_MARK &&
+	  modem_params.parity != MRBGEM_SERIALPORT_SPACE) {
+	mrb_raise(mrb, E_ARGUMENT_ERROR, "Invalid value for parity.");
+      }
+
+      result = argv[0];
+  }
+
+  return result;
+}
+
+static mrb_value
 mrb_serial_write_timeout(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  mrb_int time;
+
+  time = mrb_write_timeout_impl(mrb);
+
+  return mrb_fixnum_value(time);
 }
 
-mrb_value
+static mrb_value
 mrb_serial_set_write_timeout(mrb_state *mrb, mrb_value val)
 {
-  mrb_raise(mrb, E_NOTIMP_ERROR, "Not implemented yet");
-  return mrb_nil_value();
+  mrb_int time;
+
+  if (mrb_type(val) != MRB_TT_FIXNUM) {
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
+  }
+
+  time = mrb_fixnum(val);
+  mrb_set_write_timeout_impl(mrb, time);
+
+  return val;
 }
 
 void
