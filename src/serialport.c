@@ -53,7 +53,7 @@ mrb_serial_break(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "i", &time);
 
-  mrb_serial_break_impl(mrb, time);
+  mrb_serial_break_impl(mrb, self, time);
 
   return mrb_nil_value();
 }
@@ -78,7 +78,7 @@ mrb_serial_set_dtr(mrb_state *mrb, mrb_value self)
     break;
   }
 
-  mrb_serial_set_signals_impl(mrb, &signals);
+  mrb_serial_set_signals_impl(mrb, self, &signals);
 
   return mrb_fixnum_value(dtr);
 }
@@ -88,7 +88,7 @@ mrb_serial_flow_control(mrb_state *mrb, mrb_value self)
 {
   mrb_int flow_control;
 
-  flow_control = mrb_serial_flow_control_impl(mrb);
+  flow_control = mrb_serial_flow_control_impl(mrb, self);
 
   return mrb_fixnum_value(flow_control);
 }
@@ -100,7 +100,7 @@ mrb_serial_set_flow_control(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "i", &flow_control);
 
-  mrb_serial_set_flow_control_impl(mrb, flow_control);
+  mrb_serial_set_flow_control_impl(mrb, self, flow_control);
 
   return mrb_fixnum_value(flow_control);
 }
@@ -111,7 +111,7 @@ mrb_serial_get_modem_params(mrb_state *mrb, mrb_value self)
   struct modem_params_t modem_params;
   mrb_value hash;
 
-  mrb_serial_get_modem_params_impl(mrb, &modem_params);
+  mrb_serial_get_modem_params_impl(mrb, self, &modem_params);
 
   hash = mrb_hash_new(mrb);
 
@@ -129,7 +129,7 @@ mrb_serial_get_signals(mrb_state *mrb, mrb_value self)
   struct line_signals_t signals;
   mrb_value hash;
 
-  mrb_serial_get_signals_impl(mrb, &signals);
+  mrb_serial_get_signals_impl(mrb, self, &signals);
 
   hash = mrb_hash_new(mrb);
 
@@ -148,11 +148,7 @@ mrb_serial_get_signals(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_serial_read_timeout(mrb_state *mrb, mrb_value self)
 {
-  mrb_int time;
-
-  time = mrb_read_timeout_impl(mrb);
-
-  return mrb_fixnum_value(time);
+  return mrb_read_timeout_impl(mrb, self);
 }
 
 static mrb_value
@@ -162,7 +158,7 @@ mrb_serial_set_read_timeout(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "i", &time);
 
-  mrb_set_read_timeout_impl(mrb, time);
+  mrb_set_read_timeout_impl(mrb, self, time);
 
   return mrb_fixnum_value(time);
 }
@@ -187,7 +183,7 @@ mrb_serial_set_rts(mrb_state *mrb, mrb_value self)
     break;
   }
 
-  mrb_serial_set_signals_impl(mrb, &signals);
+  mrb_serial_set_signals_impl(mrb, self, &signals);
 
   return mrb_fixnum_value(rts);
 }
@@ -320,7 +316,7 @@ mrb_serial_set_modem_params(mrb_state *mrb, mrb_value self)
     result = self;
   }
   else {
-      mrb_serial_get_modem_params_impl(mrb, &modem_params);
+      mrb_serial_get_modem_params_impl(mrb, self, &modem_params);
 
       if (argc == 1 && mrb_type(argv[0]) == MRB_TT_HASH) {
 	mrb_serial_set_modem_params_hash(mrb, argv[0], &modem_params);
@@ -351,6 +347,8 @@ mrb_serial_set_modem_params(mrb_state *mrb, mrb_value self)
 	mrb_raise(mrb, E_ARGUMENT_ERROR, "Invalid value for parity.");
       }
 
+      mrb_serial_set_modem_params_impl(mrb, self, & modem_params);
+
       result = argv[0];
   }
 
@@ -362,7 +360,7 @@ mrb_serial_write_timeout(mrb_state *mrb, mrb_value self)
 {
   mrb_int time;
 
-  time = mrb_write_timeout_impl(mrb);
+  time = mrb_write_timeout_impl(mrb, self);
 
   return mrb_fixnum_value(time);
 }
@@ -374,7 +372,7 @@ mrb_serial_set_write_timeout(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "i", &time);
 
-  mrb_set_write_timeout_impl(mrb, time);
+  mrb_set_write_timeout_impl(mrb, self, time);
 
   return mrb_fixnum_value(time);
 }

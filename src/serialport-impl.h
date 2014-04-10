@@ -26,6 +26,8 @@
 #define MRBGEM_MRBGEM_SERIALPORT_IMPL_H__
 
 #include "mruby.h"
+#include "mruby/ext/io.h"
+#include "serialport.h"
 
 struct modem_params_t {
   mrb_int baud_rate;
@@ -46,16 +48,16 @@ struct line_signals_t {
   mrb_int ri;
 };
 
-void mrb_serial_break_impl(mrb_state *mrb, mrb_int time);
-mrb_int mrb_serial_flow_control_impl(mrb_state *mrb);
-void  mrb_serial_set_flow_control_impl(mrb_state *mrb, mrb_int flow_control);
-mrb_int mrb_read_timeout_impl(mrb_state *mrb);
-void mrb_set_read_timeout_impl(mrb_state *mrb, mrb_int time);
-mrb_int mrb_write_timeout_impl(mrb_state *mrb);
-void mrb_set_write_timeout_impl(mrb_state *mrb, mrb_int time);
-void mrb_serial_get_modem_params_impl(mrb_state *mrb, struct modem_params_t *modem_params);
-void mrb_serial_get_signals_impl(mrb_state *mrb, struct line_signals_t *signals);
-mrb_value mrb_serial_set_modem_params_impl(mrb_state *mrb, struct modem_params_t *modem_params);
-void mrb_serial_set_signals_impl(mrb_state *mrb, struct line_signals_t *signals);
+void mrb_serial_break_impl(mrb_state *mrb, mrb_value self, mrb_int time);
+mrb_int mrb_serial_flow_control_impl(mrb_state *mrb, mrb_value self);
+void  mrb_serial_set_flow_control_impl(mrb_state *mrb, mrb_value self, mrb_int flow_control);
+mrb_value mrb_read_timeout_impl(mrb_state *mrb, mrb_value self);
+void mrb_set_read_timeout_impl(mrb_state *mrb, mrb_value self, mrb_int time);
+mrb_int mrb_write_timeout_impl(mrb_state *mrb, mrb_value self);
+void mrb_set_write_timeout_impl(mrb_state *mrb, mrb_value self, mrb_int time);
+void mrb_serial_get_modem_params_impl(mrb_state *mrb, mrb_value self, struct modem_params_t *modem_params);
+void mrb_serial_get_signals_impl(mrb_state *mrb, mrb_value self, struct line_signals_t *signals);
+void mrb_serial_set_modem_params_impl(mrb_state *mrb, mrb_value self, struct modem_params_t *modem_params);
+void mrb_serial_set_signals_impl(mrb_state *mrb, mrb_value self, struct line_signals_t *signals);
 
 #endif /* MRBGEM_MRBGEM_SERIALPORT_IMPL_H__ */
