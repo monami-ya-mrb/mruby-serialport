@@ -47,28 +47,26 @@ static mrb_sym sym_dcd;
 static mrb_sym sym_ri;
 
 static mrb_value
-mrb_serial_break(mrb_state *mrb, mrb_value val)
+mrb_serial_break(mrb_state *mrb, mrb_value self)
 {
   mrb_int time;
-  if (mrb_type(val) != MRB_TT_FIXNUM) {
-    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
-  }
 
-  time = mrb_fixnum(val);
+  mrb_get_args(mrb, "i", &time);
+
   mrb_serial_break_impl(mrb, time);
 
   return mrb_nil_value();
 }
 
 static mrb_value
-mrb_serial_set_dtr(mrb_state *mrb, mrb_value val)
+mrb_serial_set_dtr(mrb_state *mrb, mrb_value self)
 {
   struct line_signals_t signals = { 0 };
+  mrb_int dtr;
 
-  if (mrb_type(val) != MRB_TT_FIXNUM) {
-    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
-  }
-  switch (mrb_fixnum(val)) {
+  mrb_get_args(mrb, "i", &dtr);
+
+  switch (dtr) {
   case 0:
     signals.dtr = -1;
     break;
@@ -82,11 +80,11 @@ mrb_serial_set_dtr(mrb_state *mrb, mrb_value val)
 
   mrb_serial_set_signals_impl(mrb, &signals);
 
-  return val;
+  return mrb_fixnum_value(dtr);
 }
 
 static mrb_value
-mrb_serial_flow_control(mrb_state *mrb, mrb_value val)
+mrb_serial_flow_control(mrb_state *mrb, mrb_value self)
 {
   mrb_int flow_control;
 
@@ -96,22 +94,19 @@ mrb_serial_flow_control(mrb_state *mrb, mrb_value val)
 }
 
 static mrb_value
-mrb_serial_set_flow_control(mrb_state *mrb, mrb_value val)
+mrb_serial_set_flow_control(mrb_state *mrb, mrb_value self)
 {
   mrb_int flow_control;
 
-  if (mrb_type(val) != MRB_TT_FIXNUM) {
-    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
-  }
+  mrb_get_args(mrb, "i", &flow_control);
 
-  flow_control = mrb_fixnum(val);
   mrb_serial_set_flow_control_impl(mrb, flow_control);
 
-  return val;
+  return mrb_fixnum_value(flow_control);
 }
 
 static mrb_value
-mrb_serial_get_modem_params(mrb_state *mrb, mrb_value val)
+mrb_serial_get_modem_params(mrb_state *mrb, mrb_value self)
 {
   struct modem_params_t modem_params;
   mrb_value hash;
@@ -129,7 +124,7 @@ mrb_serial_get_modem_params(mrb_state *mrb, mrb_value val)
 }
 
 static mrb_value
-mrb_serial_get_signals(mrb_state *mrb, mrb_value val)
+mrb_serial_get_signals(mrb_state *mrb, mrb_value self)
 {
   struct line_signals_t signals;
   mrb_value hash;
@@ -151,7 +146,7 @@ mrb_serial_get_signals(mrb_state *mrb, mrb_value val)
 }
 
 static mrb_value
-mrb_serial_read_timeout(mrb_state *mrb, mrb_value val)
+mrb_serial_read_timeout(mrb_state *mrb, mrb_value self)
 {
   mrb_int time;
 
@@ -161,29 +156,26 @@ mrb_serial_read_timeout(mrb_state *mrb, mrb_value val)
 }
 
 static mrb_value
-mrb_serial_set_read_timeout(mrb_state *mrb, mrb_value val)
+mrb_serial_set_read_timeout(mrb_state *mrb, mrb_value self)
 {
   mrb_int time;
 
-  if (mrb_type(val) != MRB_TT_FIXNUM) {
-    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
-  }
+  mrb_get_args(mrb, "i", &time);
 
-  time = mrb_fixnum(val);
   mrb_set_read_timeout_impl(mrb, time);
 
-  return val;
+  return mrb_fixnum_value(time);
 }
 
 static mrb_value
-mrb_serial_set_rts(mrb_state *mrb, mrb_value val)
+mrb_serial_set_rts(mrb_state *mrb, mrb_value self)
 {
   struct line_signals_t signals = { 0 };
+  mrb_int rts;
 
-  if (mrb_type(val) != MRB_TT_FIXNUM) {
-    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
-  }
-  switch (mrb_fixnum(val)) {
+  mrb_get_args(mrb, "i", &rts);
+
+  switch (rts) {
   case 0:
     signals.rts = -1;
     break;
@@ -197,7 +189,7 @@ mrb_serial_set_rts(mrb_state *mrb, mrb_value val)
 
   mrb_serial_set_signals_impl(mrb, &signals);
 
-  return val;
+  return mrb_fixnum_value(rts);
 }
 
 
@@ -366,7 +358,7 @@ mrb_serial_set_modem_params(mrb_state *mrb, mrb_value self)
 }
 
 static mrb_value
-mrb_serial_write_timeout(mrb_state *mrb, mrb_value val)
+mrb_serial_write_timeout(mrb_state *mrb, mrb_value self)
 {
   mrb_int time;
 
@@ -376,18 +368,15 @@ mrb_serial_write_timeout(mrb_state *mrb, mrb_value val)
 }
 
 static mrb_value
-mrb_serial_set_write_timeout(mrb_state *mrb, mrb_value val)
+mrb_serial_set_write_timeout(mrb_state *mrb, mrb_value self)
 {
   mrb_int time;
 
-  if (mrb_type(val) != MRB_TT_FIXNUM) {
-    mrb_raise(mrb, E_ARGUMENT_ERROR, "Must be fixnum.");
-  }
+  mrb_get_args(mrb, "i", &time);
 
-  time = mrb_fixnum(val);
   mrb_set_write_timeout_impl(mrb, time);
 
-  return val;
+  return mrb_fixnum_value(time);
 }
 
 void
