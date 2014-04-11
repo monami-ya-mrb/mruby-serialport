@@ -27,6 +27,78 @@
 #include <sys/ioctl.h>
 #include "serialport-impl.h"
 
+mrb_int mrb_serial_create_port_impl(mrb_state *mrb, mrb_value self)
+{
+  mrb_value val;
+  enum mrb_vtype vtype;
+  mrb_int fileno;
+
+  mrb_get_args(mrb, "o", &val);
+
+  vtype = mrb_type(val);
+
+  if (vtype == MRB_TT_STRING) {
+    struct RString *rstring;
+    struct termios params;
+    char path[PATH_MAX];
+    mrb_int len;
+
+    rstring = mrb_str_ptr(val);
+    len = mrb_str_strlen(mrb, rstring);
+    if (len < 0 || (size_t)len > PATH_MAX) {
+      mrb_raise(mrb, E_ARGUMENT_ERROR, "Invalid pathname.");
+    }
+    memcpy(path, RSTRING_PTR(val), (size_t)len + 1);
+
+    fileno = open(path, O_RDWR | O_NOCTTY | O_NDELAY);
+    if (fileno == -1) {
+      mrb_raise(mrb, E_IO_ERROR, "Can't open serialport.");
+    }
+
+    if (!isatty(fileno)) {
+      close(fileno);
+      mrb_raise(mrb, E_ARGUMENT_ERROR, "not a serial port");
+    }
+
+    /* blocking read */
+    {
+      int fl;
+      fl = fcntl(fileno, F_GETFL, 0);
+      fcntl(fileno, F_SETFL, fl & ~O_NONBLOCK);
+    }
+
+    /* Don't use serial_tcgetattr()
+     * because this instance has not been initialized yet. */
+    if (tcgetattr(fileno, &params) == -1) {
+      close(fileno);
+      mrb_raise(mrb, E_IO_ERROR, "tcgetattr");
+    }
+
+    params.c_oflag = 0;
+    params.c_lflag = 0;
+    params.c_iflag &= (IXON | IXOFF | IXANY);
+    params.c_cflag |= CLOCAL | CREAD;
+    params.c_cflag &= ~HUPCL;
+
+    if (tcsetattr(fileno, TCSANOW, &params) == -1) {
+      close(fileno);
+      mrb_raise(mrb, E_IO_ERROR, "tcsetattr");
+    }
+  }
+  else {
+    if (vtype == MRB_TT_FIXNUM) {
+      mrb_raise(mrb, E_ARGUMENT_ERROR, "Illegal port number");
+    }
+    else {
+      mrb_raise(mrb, E_TYPE_ERROR, "Wring argument type");
+    }
+    fileno = -1;
+  }
+
+  return fileno;
+}
+
+
 static int
 get_fd_helper(mrb_state *mrb, mrb_value self)
 {

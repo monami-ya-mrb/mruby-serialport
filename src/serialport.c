@@ -47,6 +47,16 @@ static mrb_sym sym_dcd;
 static mrb_sym sym_ri;
 
 static mrb_value
+mrb_serial_create_port(mrb_state *mrb, mrb_value self)
+{
+  mrb_int fd;
+
+  fd = mrb_serial_create_port_impl(mrb, self);
+
+  return mrb_fixnum_value(fd);
+}
+
+static mrb_value
 mrb_serial_break(mrb_state *mrb, mrb_value self)
 {
   mrb_int time;
@@ -398,6 +408,8 @@ mrb_mruby_serialport_gem_init(mrb_state *mrb)
   sym_dsr = mrb_intern_lit(mrb, "dsr");
   sym_dcd = mrb_intern_lit(mrb, "dcd");
   sym_ri  = mrb_intern_lit(mrb, "ri");
+
+  mrb_define_method(mrb, serialport_class, "create_port", mrb_serial_create_port, MRB_ARGS_REQ(1));
 
   mrb_define_method(mrb, serialport_class, "break",            mrb_serial_break,             MRB_ARGS_REQ(1));
   mrb_define_method(mrb, serialport_class, "dtr=",             mrb_serial_set_dtr,           MRB_ARGS_REQ(1));

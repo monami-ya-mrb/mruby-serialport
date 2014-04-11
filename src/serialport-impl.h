@@ -26,6 +26,7 @@
 #define MRBGEM_MRBGEM_SERIALPORT_IMPL_H__
 
 #include "mruby.h"
+#include "mruby/string.h"
 #include "mruby/ext/io.h"
 #include "serialport.h"
 
@@ -47,6 +48,8 @@ struct line_signals_t {
   mrb_int dcd;
   mrb_int ri;
 };
+
+mrb_int mrb_serial_create_port_impl(mrb_state *mrb, mrb_value self);
 
 void mrb_serial_break_impl(mrb_state *mrb, mrb_value self, mrb_int time);
 mrb_int mrb_serial_flow_control_impl(mrb_state *mrb, mrb_value self);

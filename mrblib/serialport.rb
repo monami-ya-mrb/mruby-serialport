@@ -1,17 +1,17 @@
 
-def SerialPort::new(port, *params)
-  serial_port = super(port, "w+")
-
-  begin
-    serial_port.set_modem_params(*params)
-  rescue
-    serial_port.close
-    raise
-  end
-  serial_port
-end
-
 class SerialPort
+
+  def initialize(port, *params)
+    fileno = create_port(port)
+    super(fileno, "rw");
+
+    begin
+      set_modem_params(*params)
+    rescue
+      close
+      raise
+    end
+  end
 
   def self.open(port, *params, &block)
     serial_port = self.new(port, params)
