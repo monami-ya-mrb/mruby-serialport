@@ -3,7 +3,7 @@ class SerialPort
 
   def initialize(port, *params)
     fileno = create_port(port)
-    super(fileno, "rw");
+    super(fileno, "r+");
 
     begin
       set_modem_params(*params)
