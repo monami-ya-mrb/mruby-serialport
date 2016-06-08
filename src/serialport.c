@@ -393,7 +393,7 @@ mrb_mruby_serialport_gem_init(mrb_state *mrb)
   struct RClass *io_class = mrb_class_get(mrb, "IO");
   struct RClass *serialport_class;
 
-  mrb_assert(io != NULL);
+  mrb_assert(io_class != NULL);
 
   serialport_class = mrb_define_class(mrb, "SerialPort", io_class);
 
