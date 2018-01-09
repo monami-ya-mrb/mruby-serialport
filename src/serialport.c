@@ -210,7 +210,7 @@ mrb_serial_set_modem_params_hash(mrb_state *mrb, mrb_value hash, struct modem_pa
   mrb_int int_value;
 
   keys = mrb_hash_keys(mrb, hash);
-  keys_len = mrb_ary_len(mrb, keys);
+  keys_len = RARRAY_LEN(keys);
 
   for (i = 0; i < keys_len; i++) {
     mrb_value cmp;
